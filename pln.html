@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerçekçi Çiçekler (Merkezsiz)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+<script>
+let flowers = []; // Çiçeklerin pozisyonlarını sakla
+const minDistance = 60; // Çiçekler arası minimum mesafe
+
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    background(135, 206, 235); // Gökyüzü mavisi
+}
+
+function draw() {
+    // Her 10 karede bir yeni çiçek ekle
+    if (frameCount % 10 === 0) {
+        let x = random(width);
+        let y = random(height);
+        let canPlace = true;
+
+        // Çakışma kontrolü
+        for (let flower of flowers) {
+            let d = dist(x, y, flower.x, flower.y);
+            if (d < minDistance) {
+                canPlace = false;
+                break;
+            }
+        }
+
+        if (canPlace) {
+            flowers.push({ x, y });
+            drawFlower(x, y);
+        }
+    }
+}
+
+function drawFlower(x, y) {
+    // Yapraklar (gerçekçi gradient ve şekil)
+    let petalCount = floor(random(5, 8)); // 5-7 yaprak
+    let baseColor = color(random(200, 255), random(50, 150), random(50, 150)); // Pastel tonlar
+    for (let i = 0; i < petalCount; i++) {
+        push();
+        translate(x, y);
+        rotate(TWO_PI * i / petalCount + random(-0.1, 0.1)); // Hafif rastgele sapma
+        let gradient = drawingContext.createLinearGradient(0, 0, 40, 0);
+        gradient.addColorStop(0, baseColor);
+        gradient.addColorStop(1, color(red(baseColor), green(baseColor), blue(baseColor), 50));
+        drawingContext.fillStyle = gradient;
+        noStroke();
+        beginShape();
+        curveVertex(0, 0);
+        curveVertex(0, 0);
+        curveVertex(20, -5);
+        curveVertex(40, 0);
+        curveVertex(20, 5);
+        curveVertex(0, 0);
+        curveVertex(0, 0);
+        endShape(CLOSE);
+        pop();
+    }
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    background(135, 206, 235); // Arka planı yenile
+    // Mevcut çiçekleri yeniden çiz
+    for (let flower of flowers) {
+        drawFlower(flower.x, flower.y);
+    }
+}
+</script>
+</body>
+</html>
